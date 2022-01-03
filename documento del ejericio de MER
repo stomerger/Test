@@ -1,1 +1,149 @@
 
+-- MySQL Workbench Forward Engineering
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+-- -----------------------------------------------------
+-- Schema prueba
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Schema prueba
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `prueba` DEFAULT CHARACTER SET utf8 ;
+USE `prueba` ;
+
+-- -----------------------------------------------------
+-- Table `prueba`.`proveedores`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `prueba`.`proveedores` (
+  `RUT` INT NOT NULL AUTO_INCREMENT,
+  `NOMBRE` VARCHAR(45) NULL,
+  `DIRRECION` VARCHAR(45) NULL,
+  `TELEFONO` INT NULL,
+  `PAGINA_WEB` VARCHAR(45) NULL,
+  PRIMARY KEY (`RUT`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `prueba`.`categoria`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `prueba`.`categoria` (
+  `ID` INT NOT NULL AUTO_INCREMENT,
+  `NOMBRE` VARCHAR(45) NULL,
+  `DESCRIPCION` LONGTEXT NULL,
+  PRIMARY KEY (`ID`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `prueba`.`producto`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `prueba`.`producto` (
+  `NOMBRE` VARCHAR(45) NULL,
+  `PRECIO` INT NULL,
+  `STOCK` INT NULL,
+  `NOMBRE_PROVEE` VARCHAR(45) NULL,
+  `proveedores_RUT` INT NOT NULL,
+  `categoria_ID` INT NOT NULL,
+  `categoria_ID1` INT NOT NULL,
+  `proveedores_RUT1` INT NOT NULL,
+  `boleta_ID` INT NOT NULL,
+  PRIMARY KEY (`proveedores_RUT`, `categoria_ID`, `categoria_ID1`, `proveedores_RUT1`, `boleta_ID`),
+  INDEX `fk_producto_proveedores1_idx` (`proveedores_RUT` ASC),
+  INDEX `fk_producto_categoria1_idx` (`categoria_ID` ASC),
+  INDEX `fk_producto_categoria2_idx` (`categoria_ID1` ASC),
+  INDEX `fk_producto_proveedores2_idx` (`proveedores_RUT1` ASC),
+  INDEX `fk_producto_boleta1_idx` (`boleta_ID` ASC),
+  CONSTRAINT `fk_producto_proveedores1`
+    FOREIGN KEY (`proveedores_RUT`)
+    REFERENCES `prueba`.`proveedores` (`RUT`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_producto_categoria1`
+    FOREIGN KEY (`categoria_ID`)
+    REFERENCES `prueba`.`categoria` (`ID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_producto_categoria2`
+    FOREIGN KEY (`categoria_ID1`)
+    REFERENCES `prueba`.`categoria` (`ID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_producto_proveedores2`
+    FOREIGN KEY (`proveedores_RUT1`)
+    REFERENCES `prueba`.`proveedores` (`RUT`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_producto_boleta1`
+    FOREIGN KEY (`boleta_ID`)
+    REFERENCES `prueba`.`boleta` (`ID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `prueba`.`boleta`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `prueba`.`boleta` (
+  `ID` INT NOT NULL,
+  `FECHA` DATE NULL,
+  `NOMBRE_CLIEN` VARCHAR(45) NULL,
+  `DESCUENTO` DECIMAL(0,2) NULL,
+  `PRECIO_FINAL` DECIMAL(0,3) NULL,
+  `clientes_RUT` INT NOT NULL,
+  PRIMARY KEY (`ID`, `clientes_RUT`),
+  INDEX `fk_boleta_clientes1_idx` (`clientes_RUT` ASC),
+  CONSTRAINT `ID`
+    FOREIGN KEY (`ID`)
+    REFERENCES `prueba`.`producto` (`categoria_ID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_boleta_clientes1`
+    FOREIGN KEY (`clientes_RUT`)
+    REFERENCES `prueba`.`clientes` (`RUT`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `prueba`.`clientes`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `prueba`.`clientes` (
+  `RUT` INT NOT NULL AUTO_INCREMENT,
+  `NOMBRE` VARCHAR(45) NULL,
+  `DIRECCION` VARCHAR(60) NULL,
+  `TELEFONO` INT NULL,
+  `boleta_ID` INT NOT NULL,
+  `boleta_clientes_RUT` INT NOT NULL,
+  PRIMARY KEY (`RUT`, `boleta_ID`, `boleta_clientes_RUT`),
+  INDEX `fk_clientes_boleta1_idx` (`boleta_ID` ASC, `boleta_clientes_RUT` ASC),
+  CONSTRAINT `fk_clientes_boleta1`
+    FOREIGN KEY (`boleta_ID` , `boleta_clientes_RUT`)
+    REFERENCES `prueba`.`boleta` (`ID` , `clientes_RUT`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `prueba`.`venta`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `prueba`.`venta` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `PRECIO` INT NULL,
+  `CANTIDAD_VENDI` INT NULL,
+  `MONTO_TOTAL` DECIMAL(0,3) NULL,
+  PRIMARY KEY (`id`),
+  INDEX `rut` (`id` ASC))
+ENGINE = InnoDB;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
